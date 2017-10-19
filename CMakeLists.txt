@@ -13,7 +13,7 @@ add_executable(MasterProjekt ${SOURCE_FILES} ${TEST_FILES} ${HEADER_FILES})
 include_directories(./googletest/googletest/include)
 
 target_link_libraries(MasterProjekt
-        /home/hs/CLionProjects/MasterProjekt/googletest/googletest/build/libgtest.a
-        /home/hs/CLionProjects/MasterProjekt/googletest/googletest/build/libgtest_main.a
+        ${CMAKE_SOURCE_DIR}/googletest/googletest/build/libgtest.a
+        ${CMAKE_SOURCE_DIR}/googletest/googletest/build/libgtest_main.a
         )
 target_link_libraries(MasterProjekt Threads::Threads)
