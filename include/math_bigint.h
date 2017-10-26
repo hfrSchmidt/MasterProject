@@ -19,11 +19,8 @@ namespace Math
         std::string removeLeadingZeros(std::string _input) const;
         CBigInt karatsubaMultiplication(CBigInt &_arg1, CBigInt &_arg2);
         CBigInt simpleMultiplication(CBigInt &_smallArg, CBigInt &_largerArg);
-
-    public:
-        static const CBigInt ZERO;
-        static const CBigInt ONE;
-        
+        CBigInt multPow10(size_t _exponent, CBigInt &_multiplicand);
+        void split(CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder);
         
     public:
         // Constructors
@@ -90,6 +87,7 @@ namespace Math
         const bool& getSign() const;
         const std::string& getNumber() const;
         const bool& isPrime();
+        
     
     }; // class CBigInt
     

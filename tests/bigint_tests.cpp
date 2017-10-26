@@ -313,6 +313,9 @@ TEST(unaryOperator, minus)
     
     bigInt = -bigInt;
     ASSERT_TRUE(bigInt.getSign());
+    
+    bigInt = -10;
+    ASSERT_TRUE(bigInt.getSign());
 }
 
 TEST(unaryOperator, incrementDecrement) {
@@ -358,6 +361,11 @@ TEST(arithmeticOperator, plus){
     bigInt3 = bigInt + bigInt2;
     
     ASSERT_EQ(bigInt3.getNumber(), "12");
+    
+    bigInt = "10000";
+    bigInt2 = "2800";
+    bigInt3 = bigInt + bigInt2;
+    ASSERT_EQ(bigInt3.getNumber(), "12800");
 }
 
 TEST(arithmeticOperator, minus) {
@@ -377,6 +385,23 @@ TEST(arithmeticOperator, minus) {
     
     ASSERT_EQ((bigInt - bigInt2).getNumber(), "5");
     ASSERT_TRUE((bigInt - bigInt2).getSign());
+    
+    bigInt = "100000";
+    bigInt2 = "999";
+    
+    ASSERT_EQ((bigInt - bigInt2).getNumber(), "99001");
+    
+    bigInt = "-5";
+    bigInt2 = "5";
+    
+    ASSERT_EQ((bigInt - bigInt2).getNumber(), "10");
+    ASSERT_TRUE((bigInt - bigInt2).getSign());
+    
+    bigInt = "5";
+    bigInt2 = "-5";
+    
+    ASSERT_EQ((bigInt - bigInt2).getNumber(), "10");
+    ASSERT_FALSE((bigInt - bigInt2).getSign());
 }
 
 TEST(arithmeticOperator, simpleMultiplication) {
@@ -393,5 +418,47 @@ TEST(arithmeticOperator, simpleMultiplication) {
     bigInt2 = 9L;
     
     ASSERT_EQ((bigInt * bigInt2).getNumber(), "450");
+}
+
+TEST(arithmeticOperator, karatsubaMultiplication) {
+    Math::CBigInt bigInt = new Math::CBigInt("10");
+    Math::CBigInt bigInt2 = new Math::CBigInt("10");
+    
+    ASSERT_EQ((bigInt * bigInt2).getNumber(), "100");
+    
+    bigInt = 27;
+    bigInt2 = 124;
+    
+    ASSERT_EQ((bigInt * bigInt2).getNumber(), "3348");
+    
+    bigInt = 105;
+    bigInt2 = 123;
+    
+    ASSERT_EQ((bigInt * bigInt2).getNumber(), "12915");
+    
+    bigInt = "12345";
+    bigInt2 = "6789";
+    
+    ASSERT_EQ((bigInt * bigInt2).getNumber(), "83810205");
+    
+    bigInt = "123456789";
+    bigInt2 = "987654321";
+    
+    ASSERT_EQ((bigInt * bigInt2).getNumber(), "121932631112635269");
+    
+    bigInt = "123456789";
+    bigInt2 = "987";
+    
+    ASSERT_EQ((bigInt * bigInt2).getNumber(), "121851850743");
+    
+    bigInt = "812398458302402349812093848";
+    bigInt2 = "1232342341232459934812919";
+    
+    ASSERT_EQ((bigInt * bigInt2).getNumber(), "1001153018118023490350428987359513032114783550822312");
+    
+    bigInt2 = "123456789";
+    bigInt = "987";
+    
+    ASSERT_EQ((bigInt * bigInt2).getNumber(), "121851850743");
 }
 // END arithmetic operator tests

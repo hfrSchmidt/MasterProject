@@ -11,9 +11,6 @@
 
 namespace Math
 {
-    const CBigInt CBigInt::ZERO = new CBigInt(0);
-    const CBigInt CBigInt::ONE = new CBigInt(1);
-    
     // ---------------------------------------------------------------------------------
     // BEGIN constructors
     CBigInt::CBigInt()
@@ -263,6 +260,7 @@ namespace Math
                     continue;
                 }
                 intermediate = (first_operand.getNumber().at(len_max - i - 1) - '0') - borrow;
+                borrow = 0;
                 if (intermediate < 0)
                 {
                     borrow += 1;
@@ -288,7 +286,8 @@ namespace Math
     }
     
     CBigInt CBigInt::operator*(CBigInt &_other) {
-        if (_other == ZERO || *this == ZERO) return ZERO;
+        CBigInt zero = new CBigInt(0);
+        if (_other == zero || *this == zero) return zero;
         
         return karatsubaMultiplication(*this, _other);
     }
@@ -358,34 +357,90 @@ namespace Math
     
     
     CBigInt CBigInt::karatsubaMultiplication(CBigInt &_arg1, CBigInt &_arg2) {
-        if (_arg1.getNumber().length() <= 1)
+        if (_arg1.getNumber().length() <= 2)
         {
             return simpleMultiplication(_arg1, _arg2);
         }
-        else if (_arg2.getNumber().length() <= 1)
+        else if (_arg2.getNumber().length() <= 2)
         {
             return simpleMultiplication(_arg2, _arg1);
         }
         
-        std::string result;
+        CBigInt result;
         std::string num1 = _arg1.getNumber();
         std::string num2 = _arg2.getNumber();
         
-        size_t maxLength = num1.length() > num2.length() ? num1.length() : num2.length();
+        size_t maxLength, minLength;
+        if (num1.length() > num2.length()) {
+            maxLength = num1.length();
+            minLength = num2.length();
+        } else {
+            maxLength = num2.length();
+            minLength = num1.length();
+        }
         
-        size_t b = 10 ^ (maxLength / 2);
-        std::string x1 = "";
+        size_t halfMaxLength = (maxLength) / 2;
+        /*
+        if (maxLength % 2) {
+            halfMaxLength = (maxLength + 1) / 2;
+        }*/
+        if (halfMaxLength >= minLength) {
+            halfMaxLength = minLength - 1;
+        }
+        
+        CBigInt high1, low1, high2, low2;
+        split(_arg1, halfMaxLength, high1, low1);
+        split(_arg2, halfMaxLength, high2, low2);
+        
+        CBigInt lowHigh1 = low1 + high1;
+        CBigInt lowHigh2 = low2 + high2;
+        
+        CBigInt z0 = karatsubaMultiplication(low1, low2);
+        CBigInt z1 = karatsubaMultiplication(lowHigh1, lowHigh2);
+        CBigInt z2 = karatsubaMultiplication(high1, high2);
+        
+        CBigInt z1z2z0 = z1 - z2 - z0;
+        
+        size_t m2 = (_arg1.getNumber().length()-high1.getNumber().length())
+                    + (_arg2.getNumber().length()-high2.getNumber().length());
+        
+        return (multPow10(m2, z2) + multPow10(m2/2, z1z2z0) + z0);
+    }
+    
+    CBigInt CBigInt::multPow10(size_t _exponent, CBigInt &_multiplicand) {
+        CBigInt result(_multiplicand);
+        result.m_Representation.append(_exponent, '0');
+        return result;
+    }
+    
+    
+    // splits the given input string into two substrings at the position "_at" counting from the right (end) of the
+    // original string. E.g. when _inputNumber = 1234567, _at = 2 then _highOrder = 1234 and _lowOrder = 567
+    
+    void CBigInt::split(CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder) {
+        size_t inputLength = _inputNumber.getNumber().length();
+        // substr extracts the string starting at the first argument and ending with the character at first + second
+        // i.e. _highOrder = _inputNumber[first, second]. Endpoints are included in the interval.
+        // If no second argument is given it extracts the string starting at the first argument until the end.
+        _highOrder = new CBigInt(_inputNumber.getNumber().substr(0, inputLength - _at)); // - 1 is problematic
+        try {
+            _lowOrder = new CBigInt(_inputNumber.getNumber().substr(inputLength - _at));
+            
+            //std::cout << "1st: " << _highOrder.getNumber() << "\t2nd: " << _lowOrder.getNumber() << std::endl;
+            
+        } catch (const std::out_of_range &e) {
+            std::cerr << "Split is out of range. Continuing with zero as second argument." << std::endl;
+            _lowOrder = new CBigInt(0);
+        }
     }
     
     CBigInt CBigInt::simpleMultiplication(CBigInt &_smallArg, CBigInt &_largerArg) {
-        assert(_smallArg.getNumber().length() <= 1);
-        
-        if (_smallArg == ZERO || _largerArg == ZERO) return *(new CBigInt(0));
-        
+        assert(_smallArg.getNumber().length() <= 2);
         CBigInt tmp = new CBigInt();
+        
         for (CBigInt i = 0; i < _smallArg; ++i)
         {
-            tmp = tmp + _largerArg;
+            tmp += _largerArg;
         }
         
         return tmp;
