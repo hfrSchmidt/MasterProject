@@ -211,9 +211,10 @@ namespace Math
         
         if (m_IsSigned && !_other.getSign())
         {
+            // newly constructed CBigInts are always positive. Therefor constructing a CBigInt only from the pure
+            // number-string of another results in the absolute value of the other CBigInt.
             CBigInt temp = new CBigInt(_other.getNumber());
-            m_IsSigned = !m_IsSigned;
-            return -(*this + temp);
+            return -(-*this + temp);
         }
         if (!m_IsSigned && _other.getSign()) {
             CBigInt temp = new CBigInt(_other.getNumber());
@@ -221,8 +222,7 @@ namespace Math
         }
         if (m_IsSigned && _other.getSign()) {
             CBigInt temp = new CBigInt(_other.getNumber());
-            m_IsSigned = !m_IsSigned;
-            return temp - *this;
+            return temp - -*this;
         }
         
         short borrow = 0;
