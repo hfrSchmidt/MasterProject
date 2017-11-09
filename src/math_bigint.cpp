@@ -294,7 +294,7 @@ namespace Math
     }
     
     CBigInt CBigInt::operator/ (const CBigInt& _other) {
-    
+        return simpleFlooredDivision(*this, _other);
     }
     
     CBigInt CBigInt::operator^ (const CBigInt& _other) {
@@ -371,19 +371,27 @@ namespace Math
     }
     
     
-    CBigInt CBigInt::karatsubaMultiplication(CBigInt &_arg1, CBigInt &_arg2) {
-        if (_arg1.getNumber().length() <= 2)
-        {
-            return simpleMultiplication(_arg1, _arg2);
-        }
-        else if (_arg2.getNumber().length() <= 2)
-        {
-            return simpleMultiplication(_arg2, _arg1);
-        }
+    CBigInt CBigInt::karatsubaMultiplication(const CBigInt &_arg1, const CBigInt &_arg2) {
         
         CBigInt result;
-        std::string num1 = _arg1.getNumber();
-        std::string num2 = _arg2.getNumber();
+        // signs are different --> negative result
+        bool resultSign = _arg1.getSign() != _arg2.getSign();
+        CBigInt arg1Absolute = CBigInt(_arg1.getNumber());
+        CBigInt arg2Absolute = CBigInt(_arg2.getNumber());
+        
+        if (_arg1.getNumber().length() <= 2) {
+            result = simpleMultiplication(arg1Absolute, arg2Absolute);
+            result.m_IsSigned = resultSign;
+            return result;
+        }
+        else if (_arg2.getNumber().length() <= 2) {
+            result = simpleMultiplication(arg2Absolute, arg1Absolute);
+            result.m_IsSigned = resultSign;
+            return result;
+        }
+        
+        const std::string &num1 = _arg1.getNumber();
+        const std::string &num2 = _arg2.getNumber();
         
         size_t maxLength, minLength;
         if (num1.length() > num2.length()) {
@@ -415,7 +423,9 @@ namespace Math
         size_t m2 = (_arg1.getNumber().length()-high1.getNumber().length())
                     + (_arg2.getNumber().length()-high2.getNumber().length());
         
-        return (multPow10(m2, z2) + multPow10(m2/2, z1z2z0) + z0);
+        result = (multPow10(m2, z2) + multPow10(m2/2, z1z2z0) + z0);
+        result.m_IsSigned = resultSign;
+        return result;
     }
     
     CBigInt CBigInt::multPow10(size_t _exponent, CBigInt &_multiplicand) {
@@ -428,7 +438,7 @@ namespace Math
     // splits the given input string into two substrings at the position "_at" counting from the right (end) of the
     // original string. E.g. when _inputNumber = 1234567, _at = 2 then _highOrder = 1234 and _lowOrder = 567
     
-    void CBigInt::split(CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder) {
+    void CBigInt::split(const CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder) {
         size_t inputLength = _inputNumber.getNumber().length();
         
         // substr extracts the string starting at the first argument and ending with the character at first + second
@@ -444,7 +454,7 @@ namespace Math
         }
     }
     
-    CBigInt CBigInt::simpleMultiplication(CBigInt &_smallArg, CBigInt &_largerArg) {
+    CBigInt CBigInt::simpleMultiplication(const CBigInt &_smallArg, const CBigInt &_largerArg) {
         assert(_smallArg.getNumber().length() <= 2);
         CBigInt tmp = new CBigInt();
         
@@ -493,42 +503,108 @@ namespace Math
      * --> to get this behaviour the loop must continue until mod is positive.
      */
     
-    CBigInt CBigInt::simpleModulo(CBigInt &_dividend, const CBigInt &_divisor) {
+    CBigInt CBigInt::simpleModulo(CBigInt &_dividend, CBigInt &_divisor) {
+        // _dividend mod _divisor
+        // modulo is defined as x mod y = x - y * floor(x / y)
+        CBigInt tmp = simpleFlooredDivision(_dividend, _divisor);
+        CBigInt tmp2 = karatsubaMultiplication(_divisor, tmp);
+        CBigInt tmp3 = _dividend - tmp2;
+        return  tmp3;
+    }
+    
+    
+    // The result of the floored division is the largest whole number smaller or equal to the result of the
+    // division. E.g. 5 / 2 = 2, -5 / 2 = -3
+    CBigInt CBigInt::simpleFlooredDivision(CBigInt _dividend, const CBigInt &_divisor) {
+        assert(_divisor != CBigInt());
+        
         bool dividendSign = _dividend.getSign();
         bool divisorSign = _divisor.getSign();
         
-        CBigInt mod = CBigInt(_dividend);
-        CBigInt zero = CBigInt(0);
+        CBigInt zero, result = CBigInt();
         
-        // dividend negative && divisor positive
-        // e.g. -11 mod 5 = 1
+        // dividend negative and divisor positive
+        // e.g. -5 / 2 = -3
         if (dividendSign && !divisorSign) {
-            while ((mod + _divisor) <= zero ) {
-                mod = mod + _divisor;
+            while (_dividend <= zero ) {
+                _dividend += _divisor;
+                --result;
             }
         }
-        // dividend positive && divisor negative
-        // e.g. 11 mod -5 = -1
+        // dividend negative and divisor positive
+        // e.g. 5 / -2 = -3
         else if (!dividendSign && divisorSign) {
-            while ((mod + _divisor) >= zero) {
-                mod = mod + _divisor;
+            while (_dividend >= zero) {
+                _dividend += _divisor;
+                --result;
             }
         }
-        // dividend negative && divisor negative
-        // e.g. -11 mod -5 = 1
+        // dividend and divisor negative
+        // -5 / -2 = 2
         else if (dividendSign) {
-            while ((mod - _divisor) <= zero) {
-                mod -= _divisor;
+            while ((_dividend - _divisor) <= zero) {
+                _dividend -= _divisor;
+                ++result;
             }
-            mod.m_IsSigned = !mod.m_IsSigned;
         }
-        // dividend positive && divisor positive
+        // both dividend and divisor positive
+        // e.g. 5 / 2 = 2
         else {
-            while ((mod - _divisor) >= zero) {
-                mod -= _divisor;
+            while ((_dividend - _divisor) >= zero) {
+                _dividend -= _divisor;
+                ++result;
             }
         }
-        return mod;
+        
+        return result;
+    }
+    
+    CBigInt CBigInt::simpleCeiledDivision(CBigInt _dividend, const CBigInt &_divisor) {
+        assert(_divisor != CBigInt());
+        
+        bool dividendSign = _dividend.getSign();
+        bool divisorSign = _divisor.getSign();
+    
+        CBigInt zero, result = CBigInt();
+    
+        // dividend negative and divisor positive
+        // e.g. -5 / 2 = -2
+        if (dividendSign && !divisorSign) {
+            while ((_dividend + _divisor) <= zero ) {
+                _dividend += _divisor;
+                --result;
+            }
+        }
+            // dividend negative and divisor positive
+            // e.g. 5 / -2 = -2
+        else if (!dividendSign && divisorSign) {
+            while ((_dividend + _divisor) >= zero) {
+                _dividend += _divisor;
+                --result;
+            }
+        }
+            // dividend and divisor negative
+            // -5 / -2 = 3
+        else if (dividendSign) {
+            while (_dividend  <= zero) {
+                _dividend -= _divisor;
+                ++result;
+            }
+        }
+            // both dividend and divisor positive
+            // e.g. 5 / 2 = 3
+        else {
+            while (_dividend >= zero) {
+                _dividend -= _divisor;
+                ++result;
+            }
+        }
+    
+        return result;
+    }
+    
+    CBigInt CBigInt::ceiledDivision(CBigInt &_dividend, const CBigInt &_divisor) {
+        return simpleCeiledDivision(_dividend, _divisor);
     }
     
     /*

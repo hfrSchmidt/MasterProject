@@ -420,6 +420,29 @@ TEST(arithmeticOperator, simpleMultiplication) {
     ASSERT_EQ((bigInt * bigInt2).getNumber(), "450");
 }
 
+TEST(arithmeticOperator, simpleMultiplicationNegative) {
+    Math::CBigInt bigInt = new Math::CBigInt("-4");
+    Math::CBigInt bigInt2 = new Math::CBigInt("2");
+    Math::CBigInt result = new Math::CBigInt();
+    
+    result = bigInt * bigInt2;
+    
+    ASSERT_EQ(result.getNumber(), "8");
+    ASSERT_TRUE(result.getSign());
+    
+    bigInt2 = -2;
+    result = bigInt * bigInt2;
+    
+    ASSERT_EQ(result.getNumber(), "8");
+    ASSERT_FALSE(result.getSign());
+    
+    bigInt = -2;
+    bigInt2 = 4;
+    result = bigInt * bigInt2;
+    ASSERT_EQ(result.getNumber(), "8");
+    ASSERT_TRUE(result.getSign());
+}
+
 TEST(arithmeticOperator, karatsubaMultiplication) {
     Math::CBigInt bigInt = new Math::CBigInt("10");
     Math::CBigInt bigInt2 = new Math::CBigInt("10");
@@ -462,33 +485,80 @@ TEST(arithmeticOperator, karatsubaMultiplication) {
     ASSERT_EQ((bigInt * bigInt2).getNumber(), "121851850743");
 }
 
+TEST(arithmeticOperator, simpleFlooredDivision) {
+    Math::CBigInt bigInt = new Math::CBigInt("5");
+    Math::CBigInt bigInt2 = new Math::CBigInt("2");
+    Math::CBigInt res = new Math::CBigInt();
+    
+    res = bigInt / bigInt2;
+    ASSERT_EQ(res.getNumber(), "2");
+    ASSERT_FALSE(res.getSign());
+    
+    bigInt = -5;
+    res = bigInt / bigInt2;
+    ASSERT_EQ(res.getNumber(), "3");
+    ASSERT_TRUE(res.getSign());
+    
+    bigInt2 = -2;
+    res = bigInt / bigInt2;
+    ASSERT_EQ(res.getNumber(), "2");
+    ASSERT_FALSE(res.getSign());
+    
+    bigInt = 5;
+    res = bigInt / bigInt2;
+    ASSERT_EQ(res.getNumber(), "3");
+    ASSERT_TRUE(res.getSign());
+}
+
+TEST(arithmeticOperator, simpleCeiledDivision) {
+    Math::CBigInt bigInt = new Math::CBigInt("5");
+    Math::CBigInt bigInt2 = new Math::CBigInt("2");
+    Math::CBigInt res = new Math::CBigInt();
+    
+    res = res.ceiledDivision(bigInt, bigInt2);
+    ASSERT_EQ(res.getNumber(), "3");
+    ASSERT_FALSE(res.getSign());
+    
+    bigInt = -5;
+    res = res.ceiledDivision(bigInt, bigInt2);
+    ASSERT_EQ(res.getNumber(), "2");
+    ASSERT_TRUE(res.getSign());
+    
+    bigInt2 = -2;
+    res = res.ceiledDivision(bigInt, bigInt2);
+    ASSERT_EQ(res.getNumber(), "3");
+    ASSERT_FALSE(res.getSign());
+    
+    bigInt = 5;
+    res = res.ceiledDivision(bigInt, bigInt2);
+    ASSERT_EQ(res.getNumber(), "2");
+    ASSERT_TRUE(res.getSign());
+}
+
 TEST(arithmeticOperator, modulo) {
     Math::CBigInt bigInt = new Math::CBigInt("11");
     Math::CBigInt bigInt2 = new Math::CBigInt("5");
     Math::CBigInt res = new Math::CBigInt();
     
-    /*
+    
     res = bigInt % bigInt2;
     ASSERT_EQ(res.getNumber(), "1");
     ASSERT_FALSE(res.getSign());
     
-    
     bigInt = -11;
     res = bigInt % bigInt2;
-    ASSERT_EQ(res.getNumber(), "1");
-    ASSERT_TRUE(res.getSign());
-    */
-    
+    ASSERT_EQ(res.getNumber(), "4");
+    ASSERT_FALSE(res.getSign());
     
     bigInt = 11;
     bigInt2 = -5;
     res = bigInt % bigInt2;
-    ASSERT_EQ(res.getNumber(), "1");
+    ASSERT_EQ(res.getNumber(), "4");
     ASSERT_TRUE(res.getSign());
     
     bigInt = -11;
     res = bigInt % bigInt2;
     ASSERT_EQ(res.getNumber(), "1");
-    ASSERT_FALSE(res.getSign());
+    ASSERT_TRUE(res.getSign());
 }
 // END arithmetic operator tests

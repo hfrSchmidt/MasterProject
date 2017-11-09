@@ -17,12 +17,14 @@ namespace Math
     private:
         bool less(CBigInt _a, CBigInt _b) const;
         std::string removeLeadingZeros(std::string _input) const;
-        CBigInt karatsubaMultiplication(CBigInt &_arg1, CBigInt &_arg2);
-        CBigInt simpleMultiplication(CBigInt &_smallArg, CBigInt &_largerArg);
+        CBigInt karatsubaMultiplication(const CBigInt &_arg1, const CBigInt &_arg2);
+        CBigInt simpleMultiplication(const CBigInt &_smallArg, const CBigInt &_largerArg);
         CBigInt multPow10(size_t _exponent, CBigInt &_multiplicand);
-        void split(CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder);
-        CBigInt expBySquaring(CBigInt& _base, CBigInt& _exponent);
-        CBigInt simpleModulo(CBigInt& _dividend, const CBigInt& _divisor);
+        void split(const CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder);
+        CBigInt expBySquaring(CBigInt &_base, CBigInt &_exponent);
+        CBigInt simpleModulo(CBigInt &_dividend, CBigInt &_divisor);
+        CBigInt simpleFlooredDivision(CBigInt _dividend, const CBigInt &_divisor);
+        CBigInt simpleCeiledDivision(CBigInt _dividend, const CBigInt &_divisor);
         
     public:
         // Constructors
@@ -88,6 +90,7 @@ namespace Math
         // utility functions
         const bool& getSign() const;
         const std::string& getNumber() const;
+        CBigInt ceiledDivision(CBigInt &_dividend, const CBigInt &_divisor);
         const bool& isPrime();
         
     
