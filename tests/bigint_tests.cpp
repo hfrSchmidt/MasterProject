@@ -461,4 +461,34 @@ TEST(arithmeticOperator, karatsubaMultiplication) {
     
     ASSERT_EQ((bigInt * bigInt2).getNumber(), "121851850743");
 }
+
+TEST(arithmeticOperator, modulo) {
+    Math::CBigInt bigInt = new Math::CBigInt("11");
+    Math::CBigInt bigInt2 = new Math::CBigInt("5");
+    Math::CBigInt res = new Math::CBigInt();
+    
+    /*
+    res = bigInt % bigInt2;
+    ASSERT_EQ(res.getNumber(), "1");
+    ASSERT_FALSE(res.getSign());
+    
+    
+    bigInt = -11;
+    res = bigInt % bigInt2;
+    ASSERT_EQ(res.getNumber(), "1");
+    ASSERT_TRUE(res.getSign());
+    */
+    
+    
+    bigInt = 11;
+    bigInt2 = -5;
+    res = bigInt % bigInt2;
+    ASSERT_EQ(res.getNumber(), "1");
+    ASSERT_TRUE(res.getSign());
+    
+    bigInt = -11;
+    res = bigInt % bigInt2;
+    ASSERT_EQ(res.getNumber(), "1");
+    ASSERT_FALSE(res.getSign());
+}
 // END arithmetic operator tests

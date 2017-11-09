@@ -21,6 +21,8 @@ namespace Math
         CBigInt simpleMultiplication(CBigInt &_smallArg, CBigInt &_largerArg);
         CBigInt multPow10(size_t _exponent, CBigInt &_multiplicand);
         void split(CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder);
+        CBigInt expBySquaring(CBigInt& _base, CBigInt& _exponent);
+        CBigInt simpleModulo(CBigInt& _dividend, const CBigInt& _divisor);
         
     public:
         // Constructors
@@ -67,9 +69,9 @@ namespace Math
     
         CBigInt operator+ (const CBigInt& _other);
         CBigInt operator- (const CBigInt& _other);
-        CBigInt operator* (CBigInt& _other);
+        CBigInt operator* (CBigInt _other);
         CBigInt operator/ (const CBigInt& _other);
-        CBigInt operator% (const CBigInt& _other);
+        CBigInt operator% (CBigInt& _other);
         CBigInt operator^ (const CBigInt& _other);
         
         //unary minus creates a new instance
