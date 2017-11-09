@@ -506,10 +506,7 @@ namespace Math
     CBigInt CBigInt::simpleModulo(CBigInt &_dividend, CBigInt &_divisor) {
         // _dividend mod _divisor
         // modulo is defined as x mod y = x - y * floor(x / y)
-        CBigInt tmp = simpleFlooredDivision(_dividend, _divisor);
-        CBigInt tmp2 = karatsubaMultiplication(_divisor, tmp);
-        CBigInt tmp3 = _dividend - tmp2;
-        return  tmp3;
+        return  _dividend - _divisor * simpleFlooredDivision(_dividend, _divisor);
     }
     
     
