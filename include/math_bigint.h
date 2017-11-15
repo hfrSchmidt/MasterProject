@@ -88,10 +88,14 @@ namespace Math
 
     public:
         // utility functions
-        const bool& getSign() const;
+        const bool getSign() const;
         const std::string& getNumber() const;
         CBigInt ceiledDivision(CBigInt &_dividend, const CBigInt &_divisor);
-        const bool& isPrime();
+        const bool isEven() const;
+        const bool isPrime() const;
+
+    public:
+        static CBigInt modularExponentiation(CBigInt &_base, CBigInt _exponent, CBigInt &_mod);
         
     
     }; // class CBigInt

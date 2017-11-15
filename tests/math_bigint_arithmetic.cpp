@@ -230,3 +230,46 @@ TEST(arithmeticOperator, modulo) {
     ASSERT_EQ(res.getNumber(), "1");
     ASSERT_TRUE(res.getSign());
 }
+
+TEST(arithmeticOperator, exponentiation) {
+    Math::CBigInt bigInt = new Math::CBigInt("2");
+    Math::CBigInt bigInt2 = new Math::CBigInt("3");
+    Math::CBigInt res = new Math::CBigInt();
+    
+    res = bigInt ^ bigInt2;
+    ASSERT_EQ(res.getNumber(), "8");
+    
+    bigInt = 2;
+    bigInt2 = 50;
+    res = bigInt ^ bigInt2;
+    
+    ASSERT_EQ(res.getNumber(), "1125899906842624");
+    
+    bigInt = 15;
+    bigInt2 = 25;
+    res = bigInt ^ bigInt2;
+    
+    ASSERT_EQ(res.getNumber(), "252511682940423488616943359375");
+}
+
+TEST(arithmeticOperator, fastModularExponentiation) {
+    Math::CBigInt base = new Math::CBigInt("4");
+    Math::CBigInt exponent = new Math::CBigInt("13");
+    Math::CBigInt mod = new Math::CBigInt("497");
+    Math::CBigInt res = new Math::CBigInt();
+    
+    res = Math::CBigInt::modularExponentiation(base, exponent, mod);
+    ASSERT_EQ(res.getNumber(), "445");
+    
+    base = 13;
+    exponent = 2345;
+    mod = 5;
+    res = Math::CBigInt::modularExponentiation(base, exponent, mod);
+    ASSERT_EQ(res.getNumber(), "3");
+    
+    base = 519230;
+    exponent = 841;
+    mod = 67;
+    res = Math::CBigInt::modularExponentiation(base, exponent, mod);
+    ASSERT_EQ(res.getNumber(), "55");
+}

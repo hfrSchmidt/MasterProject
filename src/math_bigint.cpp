@@ -299,7 +299,7 @@ namespace Math
     
     CBigInt CBigInt::operator^ (const CBigInt& _other) {
         CBigInt cpy = CBigInt(_other);
-        //expBySquaring(*this, cpy);
+        return expBySquaring(*this, cpy);
     }
     
     CBigInt CBigInt::operator% (CBigInt& _other) {
@@ -336,7 +336,7 @@ namespace Math
     // ---------------------------------------------------------------------------------
     
     
-    const bool& CBigInt::getSign() const {
+    const bool CBigInt::getSign() const {
         return m_IsSigned;
     }
     
@@ -604,35 +604,46 @@ namespace Math
         return simpleCeiledDivision(_dividend, _divisor);
     }
     
-    /*
-    // complexity: O(log n) assuming constant time for multiplication
+    
+    // time-complexity: O(log n) assuming constant time for multiplication
     CBigInt CBigInt::expBySquaring(CBigInt& _base, CBigInt& _exponent){
-        if (_exponent == 0 ) return 1;
-        if (_exponent == 1 ) return _base;
+        CBigInt one = CBigInt(1);
+        CBigInt zero = CBigInt(0);
+        if (_exponent == zero ) return one;
+        if (_exponent == one ) return _base;
         
         CBigInt two = CBigInt(2);
         
         CBigInt sq = _base * _base;
-        CBigInt exp = _exponent/2;
+        CBigInt exp = _exponent/two;
         
-        if (_exponent % two == 0) return expBySquaring(sq, exp);
-        exp = (_exponent - 1) / 2;
+        if (_exponent % two == zero) return expBySquaring(sq, exp);
+        exp = (_exponent - one) / two;
         CBigInt tmp = _base * expBySquaring(sq, exp);
         return _base * expBySquaring(sq, exp);
     }
     
-    //calculates base^exponent mod m
-    // complexity: O(log N)
-    template <typename T>
-    T fastModularExp(T base, T exponent, T m){
-        T s = base % m;
-        T c = 1;
+    // calculates _base^_exponent % _mod
+    // time-complexity: O(log N)
+    // function consumes a lot of memory for large inputs due to memory inefficient multiplication, modulo and division
+    CBigInt CBigInt::modularExponentiation(CBigInt &_base, CBigInt _exponent, CBigInt &_mod) {
+        CBigInt s = _base % _mod;
+        CBigInt c = 1;
+        CBigInt one = 1;
+        CBigInt two = 2;
         
-        while (exponent >= 1){
-            if (exponent & 1) c = (c * s) % m;
-            s = (s * s) % m;
-            exponent /= 2;
+        while (_exponent >= one) {
+            if (!_exponent.isEven()) c = (c * s) % _mod;
+            s = (s * s) % _mod;
+            _exponent = _exponent / two;
         }
         return c;
-    }*/
+    }
+    
+    const bool CBigInt::isEven() const {
+        char lastDigit = this->getNumber().back();
+        int intLastDigit = lastDigit - '0';
+        bool ret = (intLastDigit & 1) == 0;
+        return ret;
+    }
 }
