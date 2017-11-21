@@ -4,7 +4,27 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <cstring>
+#include <cstdlib>
+#include <cassert>
+#include <iostream>
+#include <random>
+#include <sstream>
+#include <bitset>
+#include <gmpxx.h>
+
+/*
+defines the number of repetitions of the miller-rabin test
+The probability of obtaining a false positive is 4^-l [1],
+with l = No. of repetitions.
+Therefore 20 repetitions yield an error probability of less than 9.09*10^-13,
+which should be enough in this case of application.
+
+[1] Dietzfelbinger, M. (2004) "Primality Testing in Polynomial Time - From
+randomized algorithms to PRIMES is in P". Lecture Notes in Computer Science:3000.
+Berlin: Springer-Verlag
+*/
+#define MR_REPETITIONS 20
 
 namespace Math
 {
@@ -25,6 +45,7 @@ namespace Math
         CBigInt simpleModulo(CBigInt &_dividend, CBigInt &_divisor);
         CBigInt simpleFlooredDivision(CBigInt _dividend, const CBigInt &_divisor);
         CBigInt simpleCeiledDivision(CBigInt _dividend, const CBigInt &_divisor);
+        const bool millerRabin(size_t _repetitions) const;
         
     public:
         // Constructors
@@ -96,7 +117,7 @@ namespace Math
 
     public:
         static CBigInt modularExponentiation(CBigInt &_base, CBigInt _exponent, CBigInt &_mod);
-        
+        static void genRand(CBigInt &_lowerBound, CBigInt &_upperBound, unsigned long _seed, CBigInt &_target);
     
     }; // class CBigInt
     
