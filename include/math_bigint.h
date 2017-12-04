@@ -17,14 +17,14 @@
 defines the number of repetitions of the miller-rabin test
 The probability of obtaining a false positive is 4^-l [1],
 with l = No. of repetitions.
-Therefore 20 repetitions yield an error probability of less than 9.09*10^-13,
+Therefore 10 repetitions yield an error probability of less than 9.54*10^-7,
 which should be enough in this case of application.
 
 [1] Dietzfelbinger, M. (2004) "Primality Testing in Polynomial Time - From
 randomized algorithms to PRIMES is in P". Lecture Notes in Computer Science:3000.
 Berlin: Springer-Verlag
 */
-#define MR_REPETITIONS 20
+#define MR_REPETITIONS 10
 
 namespace Math
 {
@@ -37,14 +37,17 @@ namespace Math
     private:
         bool less(CBigInt _a, CBigInt _b) const;
         std::string removeLeadingZeros(std::string _input) const;
-        CBigInt karatsubaMultiplication(const CBigInt &_arg1, const CBigInt &_arg2);
-        CBigInt simpleMultiplication(const CBigInt &_smallArg, const CBigInt &_largerArg);
-        CBigInt multPow10(size_t _exponent, CBigInt &_multiplicand);
-        void split(const CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder);
+        CBigInt karatsubaMultiplication(const CBigInt &_arg1, const CBigInt &_arg2) const;
+        CBigInt simpleMultiplication(const CBigInt &_smallArg, const CBigInt &_largerArg) const;
+        CBigInt multPow10(size_t _exponent, const CBigInt &_multiplicand) const;
+        void split(const CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder) const;
         CBigInt expBySquaring(CBigInt &_base, CBigInt &_exponent);
         CBigInt simpleModulo(CBigInt &_dividend, CBigInt &_divisor);
-        CBigInt simpleFlooredDivision(CBigInt _dividend, const CBigInt &_divisor);
+        CBigInt longDivisionModulo(CBigInt &_dividend, CBigInt &_divisor) const;
+        CBigInt simpleFlooredDivision(CBigInt _dividend, const CBigInt &_divisor) const;
+        CBigInt longDivision(CBigInt &_dividend, const CBigInt &_divisor, CBigInt &_result) const;
         CBigInt simpleCeiledDivision(CBigInt _dividend, const CBigInt &_divisor);
+        const bool simplePrimalityTest() const;
         const bool millerRabin(size_t _repetitions) const;
         
     public:
@@ -58,6 +61,8 @@ namespace Math
         CBigInt(long _number);
         CBigInt(long long _number);
 
+        // Destructor
+        //~CBigInt();
     public:
         // operators
         template<typename T>
@@ -92,7 +97,7 @@ namespace Math
     
         CBigInt operator+ (const CBigInt& _other);
         CBigInt operator- (const CBigInt& _other);
-        CBigInt operator* (CBigInt _other);
+        CBigInt operator* (CBigInt _other) const;
         CBigInt operator/ (const CBigInt& _other);
         CBigInt operator% (CBigInt& _other);
         CBigInt operator^ (const CBigInt& _other);

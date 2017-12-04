@@ -17,6 +17,7 @@ TEST(utilityFunction, isEven) {
     ASSERT_TRUE(bigInt.isEven());
 }
 
+
 TEST(utilityFunction, isPrimeSmallPrimes) {
     Math::CBigInt bigInt = 13;
     
@@ -54,7 +55,7 @@ TEST(utilityFunction, isPrimeCarmichaelNumbers) {
 }
 
 TEST(utilityFunction, isPrimeLargePrimes) {
-    /*
+    
     Math::CBigInt bigInt = 999331;
     
     ASSERT_TRUE(bigInt.isPrime());
@@ -66,7 +67,6 @@ TEST(utilityFunction, isPrimeLargePrimes) {
     bigInt = "74838457648748954900050464578792347604359487509026452654305481";
     
     ASSERT_TRUE(bigInt.isPrime());
-    */
 }
 
 TEST(utilityFunction, generateRandom) {
@@ -76,7 +76,6 @@ TEST(utilityFunction, generateRandom) {
     
     for (size_t i = 0; i < 10; ++i) {
         Math::CBigInt::genRand(lo, hi, (unsigned long) i, bigInt);
-        std::cout << bigInt.getNumber() << std::endl;
         ASSERT_TRUE(bigInt < hi && bigInt > lo);
     }
 }

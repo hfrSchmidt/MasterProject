@@ -95,7 +95,7 @@ namespace Math
     
     // unary minus operator returns a copy
     CBigInt CBigInt::operator-() {
-        CBigInt tmp = new CBigInt(this);
+        CBigInt tmp = CBigInt(this);
         if (tmp.getNumber() != "0") {
             tmp.m_IsSigned = !tmp.m_IsSigned;
         }
@@ -128,20 +128,22 @@ namespace Math
     }
     
     CBigInt CBigInt::operator+(const CBigInt &_other) {
+        if (_other == g_Zero) return *this;
+        if (*this == g_Zero) return _other;
         if (m_IsSigned && !_other.getSign()) {
-            CBigInt cpy = new CBigInt(this);
+            CBigInt cpy = CBigInt(this);
             cpy.m_IsSigned = !cpy.m_IsSigned;
-            return *(new CBigInt(_other)) - cpy;
+            return CBigInt(_other) - cpy;
         }
         if (!m_IsSigned && _other.getSign()) {
-            CBigInt temp = new CBigInt(_other);
+            CBigInt temp = CBigInt(_other);
             temp.m_IsSigned = !temp.m_IsSigned;
             return *this - temp;
         }
         if (m_IsSigned && _other.getSign()) {
-            CBigInt temp = new CBigInt(_other);
+            CBigInt temp = CBigInt(_other);
             temp.m_IsSigned = !temp.m_IsSigned;
-            CBigInt cpy = new CBigInt(this);
+            CBigInt cpy = CBigInt(this);
             cpy.m_IsSigned = !cpy.m_IsSigned;
             return -(cpy + temp);
         }
@@ -200,7 +202,7 @@ namespace Math
             intermediate = 0;
         }
         if (carry) result.insert(0, 1, (char)('0' + carry));
-        return new CBigInt(result);
+        return CBigInt(result);
     }
     
     // m_IsSigned = true --> negative
@@ -208,19 +210,21 @@ namespace Math
     
     CBigInt CBigInt::operator-(const CBigInt &_other) {
         
+        if (_other == g_Zero) return *this;
+        if (*this == g_Zero) return -CBigInt(_other);
         if (m_IsSigned && !_other.getSign())
         {
             // newly constructed CBigInts are always positive. Therefor constructing a CBigInt only from the pure
             // number-string of another results in the absolute value of the other CBigInt.
-            CBigInt temp = new CBigInt(_other.getNumber());
+            CBigInt temp = CBigInt(_other.getNumber());
             return -(-*this + temp);
         }
         if (!m_IsSigned && _other.getSign()) {
-            CBigInt temp = new CBigInt(_other.getNumber());
+            CBigInt temp = CBigInt(_other.getNumber());
             return *this + temp;
         }
         if (m_IsSigned && _other.getSign()) {
-            CBigInt temp = new CBigInt(_other.getNumber());
+            CBigInt temp = CBigInt(_other.getNumber());
             return temp - -*this;
         }
         
@@ -281,18 +285,21 @@ namespace Math
             result.insert(0, 1, (char) ('0' + intermediate));
         }
         if (otherIsLarger) result.insert(0, 1, '-');
-        return new CBigInt(result);
+        return CBigInt(result);
     }
     
-    CBigInt CBigInt::operator*(CBigInt _other) {
-        CBigInt zero = new CBigInt(0);
-        if (_other == zero || *this == zero) return zero;
+    CBigInt CBigInt::operator*(CBigInt _other) const {
+        if (_other == g_Zero || *this == g_Zero) return CBigInt();
+        CBigInt cpy = CBigInt(*this);
+        CBigInt cpyOther = CBigInt(_other);
     
-        return karatsubaMultiplication(*this, _other);
+        return karatsubaMultiplication(cpy,cpyOther);
     }
     
     CBigInt CBigInt::operator/ (const CBigInt& _other) {
-        return simpleFlooredDivision(*this, _other);
+        CBigInt res = CBigInt();
+        return longDivision(*this, _other, res);
+        //return simpleFlooredDivision(*this, _other);
     }
     
     CBigInt CBigInt::operator^ (const CBigInt& _other) {
@@ -301,7 +308,7 @@ namespace Math
     }
     
     CBigInt CBigInt::operator% (CBigInt& _other) {
-        return simpleModulo(*this, _other);
+        return longDivisionModulo(*this, _other);
     }
     
     
@@ -369,7 +376,7 @@ namespace Math
     }
     
     
-    CBigInt CBigInt::karatsubaMultiplication(const CBigInt &_arg1, const CBigInt &_arg2) {
+    CBigInt CBigInt::karatsubaMultiplication(const CBigInt &_arg1, const CBigInt &_arg2) const{
         
         CBigInt result;
         // signs are different --> negative result
@@ -426,7 +433,7 @@ namespace Math
         return result;
     }
     
-    CBigInt CBigInt::multPow10(size_t _exponent, CBigInt &_multiplicand) {
+    CBigInt CBigInt::multPow10(size_t _exponent, const CBigInt &_multiplicand) const{
         CBigInt result(_multiplicand);
         result.m_Representation.append(_exponent, '0');
         return result;
@@ -436,7 +443,7 @@ namespace Math
     // splits the given input string into two substrings at the position "_at" counting from the right (end) of the
     // original string. E.g. when _inputNumber = 1234567, _at = 2 then _highOrder = 1234 and _lowOrder = 567
     
-    void CBigInt::split(const CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder) {
+    void CBigInt::split(const CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder) const{
         size_t inputLength = _inputNumber.getNumber().length();
         
         // substr extracts the string starting at the first argument and ending with the character at first + second
@@ -452,7 +459,7 @@ namespace Math
         }
     }
     
-    CBigInt CBigInt::simpleMultiplication(const CBigInt &_smallArg, const CBigInt &_largerArg) {
+    CBigInt CBigInt::simpleMultiplication(const CBigInt &_smallArg, const CBigInt &_largerArg) const{
         assert(_smallArg.getNumber().length() <= 2);
         CBigInt tmp = CBigInt();
         
@@ -497,10 +504,15 @@ namespace Math
         return  _dividend - _divisor * simpleFlooredDivision(_dividend, _divisor);
     }
     
+    CBigInt CBigInt::longDivisionModulo(CBigInt &_dividend, CBigInt &_divisor) const{
+        CBigInt res;
+        return  _dividend - _divisor * longDivision(_dividend, _divisor, res);
+    }
+    
     
     // The result of the floored division is the largest whole number smaller or equal to the result of the
     // division. E.g. 5 / 2 = 2, -5 / 2 = -3
-    CBigInt CBigInt::simpleFlooredDivision(CBigInt _dividend, const CBigInt &_divisor) {
+    CBigInt CBigInt::simpleFlooredDivision(CBigInt _dividend, const CBigInt &_divisor) const{
         assert(_divisor != g_Zero);
         
         CBigInt result = CBigInt();
@@ -539,6 +551,60 @@ namespace Math
         }
         
         return result;
+    }
+    
+    CBigInt CBigInt::longDivision(CBigInt &_dividend, const CBigInt &_divisor, CBigInt &_result) const{
+        assert(_divisor != g_Zero);
+    
+        bool resultSign = _dividend.getSign() != _divisor.getSign();
+        CBigInt positiveDivisor = CBigInt(_divisor.m_Representation);
+        CBigInt positiveDividend = CBigInt(_dividend.m_Representation);
+        if (positiveDivisor > positiveDividend) return CBigInt();
+        
+        if ((_dividend.getNumber().length() - _divisor.getNumber().length()) < 3) {
+            return simpleFlooredDivision(_dividend, _divisor);
+        }
+        _result.m_Representation = "";
+    
+        size_t shiftingPoint = _divisor.getNumber().length() - 1;
+        CBigInt tempDivisor = 0;
+        CBigInt tempDividend = CBigInt(_dividend.m_Representation.substr(0, shiftingPoint + 1));
+        u_short currentResultDigit = 0;
+        char partial_char;
+        std::string partial("0");
+        
+        for (size_t i = 0; i < (_dividend.getNumber().length() - _divisor.getNumber().length()); ++i) {
+            while (tempDividend >= (tempDivisor + positiveDivisor) ) {
+                if (tempDividend < positiveDivisor) break;
+                tempDivisor += positiveDivisor;
+                ++currentResultDigit;
+            }
+            ++shiftingPoint;
+            _result.m_Representation.append(std::to_string(currentResultDigit));
+            
+            if (currentResultDigit != 0) {
+                tempDividend -= tempDivisor;
+                currentResultDigit = 0;
+            }
+            partial_char = _dividend.m_Representation.at(shiftingPoint);
+            partial = std::string(1, partial_char);
+            tempDividend.m_Representation.append(partial);
+            tempDividend.m_Representation = removeLeadingZeros(tempDividend.m_Representation);
+            tempDivisor = 0;
+        }
+        
+        
+        while (tempDividend >= (tempDivisor + positiveDivisor) ) {
+            if (tempDividend < positiveDivisor) break;
+            tempDivisor += positiveDivisor;
+            ++currentResultDigit;
+        }
+        
+        _result.m_Representation.append(std::to_string(currentResultDigit));
+        _result.m_Representation = removeLeadingZeros(_result.m_Representation);
+        _result.m_IsSigned = resultSign;
+        
+        return _result;
     }
     
     CBigInt CBigInt::simpleCeiledDivision(CBigInt _dividend, const CBigInt &_divisor) {
@@ -592,16 +658,22 @@ namespace Math
     
     // time-complexity: O(log n) assuming constant time for multiplication
     CBigInt CBigInt::expBySquaring(CBigInt& _base, CBigInt& _exponent){
-        if (_exponent == g_Zero ) return g_One;
-        if (_exponent == g_One ) return _base;
+        if (_exponent == g_Zero ) return CBigInt(g_One);
         
-        CBigInt sq = _base * _base;
-        CBigInt exp = _exponent/g_Two;
+        CBigInt y = CBigInt(1);
         
-        if (_exponent % g_Two == g_Zero) return expBySquaring(sq, exp);
-        exp = (_exponent - g_One) / g_Two;
-        CBigInt tmp = _base * expBySquaring(sq, exp);
-        return _base * expBySquaring(sq, exp);
+        while (_exponent > g_One) {
+            if (_exponent.isEven()) {
+                _base = _base * _base;
+                _exponent = _exponent / g_Two;
+            } else {
+                y = _base * y;
+                _base = _base * _base;
+                _exponent = (_exponent - g_One) / g_Two;
+            }
+            //std::cout << "base: " << _base.getNumber() << "\texponent: " << _exponent.getNumber() << std::endl;
+        }
+        return _base * y;
     }
     
     // calculates _base^_exponent % _mod
@@ -641,30 +713,62 @@ namespace Math
         _target = result.get_str(10);
     }
     
+    const bool CBigInt::simplePrimalityTest() const {
+        CBigInt three = CBigInt(3);
+        CBigInt six = CBigInt(6);
+        CBigInt cpy = CBigInt(*this);
+        if (*this <= g_One) return false;
+        else if (*this <= three) return true;
+        else if (this->isEven() || cpy % three == g_Zero) return false;
+        CBigInt i = 5;
+        CBigInt iPlusTwo = 0;
+        while (i * i <= *this) {
+            iPlusTwo = i + g_Two;
+            if (cpy % i == 0 || cpy % iPlusTwo == 0) return false;
+            i += six;
+        }
+        return true;
+    }
+    
+    // returns composite if *this is composite, otherwise *this is probably prime
     const bool CBigInt::millerRabin(const size_t _repetitions) const {
+        if (*this < CBigInt(500)) {
+            return simplePrimalityTest();
+        }
+        
+        if (this->isEven()) return false;
+        
         CBigInt copy = CBigInt(*this);
-        CBigInt copyMinusOne = copy - g_One;
-        CBigInt temp = copyMinusOne;
+        CBigInt d = copy - g_One;
+        CBigInt temp = d - g_One;
         
-        CBigInt a, x;
+        CBigInt a, x, r = 0;
+        bool breakToOuterLoop = false;
         
-        while (copyMinusOne.isEven()) {
-            copyMinusOne = copyMinusOne / g_Two;
+        // write n-1 as 2^r * d with d odd
+        while (d.isEven()) {
+            d = d / g_Two;
+            ++r;
         }
         
         for (size_t i = 0; i < _repetitions; ++i) {
             // generate a random number a in the interval [2, n-2]
             genRand(g_Two, temp, (unsigned long) i, a);
+            x = CBigInt::modularExponentiation(a, d, copy);
             
-            x = CBigInt::modularExponentiation(a, copyMinusOne, copy);
+            if (x == g_One || x == (copy - g_One)) continue;
             
-            while (copyMinusOne <= copy - g_One && x != g_One && x != copy - g_One) {
-                x = (x * x) % copy;
-                copyMinusOne = copyMinusOne * g_Two;
+            for (CBigInt j = 1; j < r; ++j) {
+                x = CBigInt::modularExponentiation(x, g_Two, copy);
+                //x = (x*x) % copy;
+                if (x == g_One) return false;
+                if (x == (copy - g_One)) {
+                    breakToOuterLoop = true;
+                    break;
+                }
             }
-            if (x != copy - g_One && copyMinusOne % g_Two == g_Zero) {
-                return false;
-            }
+            if (breakToOuterLoop) continue;
+            return false;
         }
         return true;
     }

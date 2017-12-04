@@ -3,9 +3,9 @@
 
 TEST(arithmeticOperator, plus){
     
-    Math::CBigInt bigInt = new Math::CBigInt("2");
-    Math::CBigInt bigInt2 = new Math::CBigInt("4");
-    Math::CBigInt bigInt3 = new Math::CBigInt();
+    Math::CBigInt bigInt = Math::CBigInt("2");
+    Math::CBigInt bigInt2 = Math::CBigInt("4");
+    Math::CBigInt bigInt3 = Math::CBigInt();
     bigInt3 = bigInt + bigInt2;
     
     ASSERT_EQ(bigInt3.getNumber(), "6");
@@ -39,18 +39,18 @@ TEST(arithmeticOperator, plus){
 
 TEST(arithmeticOperator, minus) {
     
-    Math::CBigInt bigInt = new Math::CBigInt("10");
-    Math::CBigInt bigInt2 = new Math::CBigInt("4");
+    Math::CBigInt bigInt = Math::CBigInt("10");
+    Math::CBigInt bigInt2 = Math::CBigInt("4");
     
     ASSERT_EQ((bigInt - bigInt2).getNumber(), "6");
     
-    bigInt = new Math::CBigInt("1000");
-    bigInt2 = new Math::CBigInt("999");
+    bigInt = Math::CBigInt("1000");
+    bigInt2 = Math::CBigInt("999");
     
     ASSERT_EQ((bigInt - bigInt2).getNumber(), "1");
     
-    bigInt = new Math::CBigInt("10");
-    bigInt2 = new Math::CBigInt("15");
+    bigInt = Math::CBigInt("10");
+    bigInt2 = Math::CBigInt("15");
     
     ASSERT_EQ((bigInt - bigInt2).getNumber(), "5");
     ASSERT_TRUE((bigInt - bigInt2).getSign());
@@ -74,8 +74,8 @@ TEST(arithmeticOperator, minus) {
 }
 
 TEST(arithmeticOperator, simpleMultiplication) {
-    Math::CBigInt bigInt = new Math::CBigInt("9");
-    Math::CBigInt bigInt2 = new Math::CBigInt("4");
+    Math::CBigInt bigInt = Math::CBigInt("9");
+    Math::CBigInt bigInt2 = Math::CBigInt("4");
     
     ASSERT_EQ((bigInt * bigInt2).getNumber(), "36");
     
@@ -90,9 +90,9 @@ TEST(arithmeticOperator, simpleMultiplication) {
 }
 
 TEST(arithmeticOperator, simpleMultiplicationNegative) {
-    Math::CBigInt bigInt = new Math::CBigInt("-4");
-    Math::CBigInt bigInt2 = new Math::CBigInt("2");
-    Math::CBigInt result = new Math::CBigInt();
+    Math::CBigInt bigInt = Math::CBigInt("-4");
+    Math::CBigInt bigInt2 = Math::CBigInt("2");
+    Math::CBigInt result = Math::CBigInt();
     
     result = bigInt * bigInt2;
     
@@ -113,8 +113,8 @@ TEST(arithmeticOperator, simpleMultiplicationNegative) {
 }
 
 TEST(arithmeticOperator, karatsubaMultiplication) {
-    Math::CBigInt bigInt = new Math::CBigInt("10");
-    Math::CBigInt bigInt2 = new Math::CBigInt("10");
+    Math::CBigInt bigInt = Math::CBigInt("10");
+    Math::CBigInt bigInt2 = Math::CBigInt("10");
     
     ASSERT_EQ((bigInt * bigInt2).getNumber(), "100");
     
@@ -152,14 +152,54 @@ TEST(arithmeticOperator, karatsubaMultiplication) {
     bigInt = "987";
     
     ASSERT_EQ((bigInt * bigInt2).getNumber(), "121851850743");
+    
+    bigInt= "104438888141315250669175271071662438257996424904738378038423"
+            "348328395390797155745684882681193499755834089010671443926283"
+            "798757343818579360726323608785136527794595697654370999834036"
+            "159013438371831442807001185594622637631883939771274567233468"
+            "434458661749680790870580370407128404874011860911446797778359"
+            "802900668693897688178778594690563019026094059957945343282346"
+            "930302669644305902501597239986771421554169383555988529148631"
+            "823791443449673408781187263949647510018904134900841706167509"
+            "366833385055103297208826955076998361636941193301521379682583"
+            "718809183365675122131849284636812555022599830041234478486259"
+            "567449219461702380650591324561082573183538008760862210283427"
+            "019769820231316901767800667519548507992163641937028537512478"
+            "401490715913545998279051339961155179427110683113409058427288";
+    bigInt2 = "798757343818579360726323608785136527794595697654370999834036"
+            "159013438371831442807001185594622637631883939771274567233468"
+            "434458661749680790870580370407128404874011860911446797778359"
+            "802900668693897688178778594690563019026094059957945343282346"
+            "930302669644305902501597239986771421554169383555988529148631"
+            "823791443449673408781187263949647510018904134900841706167509";
+    std::string res = "834213288831226964395752691058262096309869552822518760868137"
+                      "649639210139536942144216391417583732251137901454574315084085"
+                      "885160786571456013061118804009454763274574706708751022834284"
+                      "206512435657597694903299561296871523744043265945324353756117"
+                      "477554080221666444967419655343345673560401123529675318804676"
+                      "704557607591969211430482284008953406055828000548932849663453"
+                      "958177114483435370571675007821710856175940087054430939853882"
+                      "414529106264111247186208394225335284802928941901922180965041"
+                      "625006597711767014846018475746311333961541762578399798959910"
+                      "174526154012930526229135295851090601607397861483613253600700"
+                      "723606440363955729365858735115612704020355333000729191182701"
+                      "542443872913614945177837530085855402393784239868288467557401"
+                      "953917696440831599762472147096752470953088010146090713252162"
+                      "303506321921384359890585354420919300096196038013567329071765"
+                      "265832755106851065712663440800021378209700851985084895845875"
+                      "647719327364315134751073678908221531534841419552555381867139"
+                      "114797913838661776715275438712111380516074368722137423109453"
+                      "128591570167868597429663918175680165921237572059593518717489"
+                      "99158278024907374917237477620667567972695727836841424585592";
+    ASSERT_EQ((bigInt * bigInt2).getNumber(), res);
 }
 
 TEST(arithmeticOperator, simpleFlooredDivision) {
-    Math::CBigInt bigInt = new Math::CBigInt("5");
-    Math::CBigInt bigInt2 = new Math::CBigInt("2");
-    Math::CBigInt res = new Math::CBigInt();
+    Math::CBigInt bigInt = Math::CBigInt("5");
+    Math::CBigInt bigInt2 = Math::CBigInt("2");
+    Math::CBigInt res = Math::CBigInt();
     
-    /*
+    
     res = bigInt / bigInt2;
     ASSERT_EQ(res.getNumber(), "2");
     ASSERT_FALSE(res.getSign());
@@ -178,7 +218,25 @@ TEST(arithmeticOperator, simpleFlooredDivision) {
     res = bigInt / bigInt2;
     ASSERT_EQ(res.getNumber(), "3");
     ASSERT_TRUE(res.getSign());
-    */
+    
+    bigInt = 44415;
+    bigInt2 = 45;
+    res = bigInt / bigInt2;
+    ASSERT_EQ(res.getNumber(), "987");
+    ASSERT_FALSE(res.getSign());
+    
+    bigInt = 42041;
+    bigInt2 = 42;
+    res = bigInt / bigInt2;
+    ASSERT_EQ(res.getNumber(), "1000");
+    ASSERT_FALSE(res.getSign());
+    
+    
+    bigInt = 50;
+    bigInt2 = 2;
+    res = bigInt / bigInt2;
+    ASSERT_EQ(res.getNumber(), "25");
+    ASSERT_FALSE(res.getSign());
     
     bigInt = "1001153018118023490350428987359513032114783550822312";
     bigInt2 = "121851850743";
@@ -187,9 +245,9 @@ TEST(arithmeticOperator, simpleFlooredDivision) {
 }
 
 TEST(arithmeticOperator, simpleCeiledDivision) {
-    Math::CBigInt bigInt = new Math::CBigInt("5");
-    Math::CBigInt bigInt2 = new Math::CBigInt("2");
-    Math::CBigInt res = new Math::CBigInt();
+    Math::CBigInt bigInt = Math::CBigInt("5");
+    Math::CBigInt bigInt2 = Math::CBigInt("2");
+    Math::CBigInt res = Math::CBigInt();
     
     res = res.ceiledDivision(bigInt, bigInt2);
     ASSERT_EQ(res.getNumber(), "3");
@@ -212,9 +270,9 @@ TEST(arithmeticOperator, simpleCeiledDivision) {
 }
 
 TEST(arithmeticOperator, modulo) {
-    Math::CBigInt bigInt = new Math::CBigInt("11");
-    Math::CBigInt bigInt2 = new Math::CBigInt("5");
-    Math::CBigInt res = new Math::CBigInt();
+    Math::CBigInt bigInt = Math::CBigInt("11");
+    Math::CBigInt bigInt2 = Math::CBigInt("5");
+    Math::CBigInt res = Math::CBigInt();
     
     
     res = bigInt % bigInt2;
@@ -239,9 +297,9 @@ TEST(arithmeticOperator, modulo) {
 }
 
 TEST(arithmeticOperator, exponentiation) {
-    Math::CBigInt bigInt = new Math::CBigInt("2");
-    Math::CBigInt bigInt2 = new Math::CBigInt("3");
-    Math::CBigInt res = new Math::CBigInt();
+    Math::CBigInt bigInt = Math::CBigInt("2");
+    Math::CBigInt bigInt2 = Math::CBigInt("3");
+    Math::CBigInt res = Math::CBigInt();
     
     res = bigInt ^ bigInt2;
     ASSERT_EQ(res.getNumber(), "8");
@@ -254,7 +312,7 @@ TEST(arithmeticOperator, exponentiation) {
     
     bigInt = 15;
     bigInt2 = 25;
-    res = bigInt ^ bigInt2;
+    res = bigInt.operator^(bigInt2);
     
     ASSERT_EQ(res.getNumber(), "252511682940423488616943359375");
     
@@ -266,6 +324,7 @@ TEST(arithmeticOperator, exponentiation) {
             "614437217640300735469768018742981669034276900318581864860508"
             "53753882811946569946433649006084096");
     
+    bigInt = 2;
     bigInt2 = 4096;
     res = bigInt ^ bigInt2;
     ASSERT_EQ(res.getNumber(), "104438888141315250669175271071662438257996424904738378038423"
@@ -292,10 +351,10 @@ TEST(arithmeticOperator, exponentiation) {
 }
 
 TEST(arithmeticOperator, modularExponentiation) {
-    Math::CBigInt base = new Math::CBigInt("4");
-    Math::CBigInt exponent = new Math::CBigInt("13");
-    Math::CBigInt mod = new Math::CBigInt("497");
-    Math::CBigInt res = new Math::CBigInt();
+    Math::CBigInt base = Math::CBigInt("4");
+    Math::CBigInt exponent = Math::CBigInt("13");
+    Math::CBigInt mod = Math::CBigInt("497");
+    Math::CBigInt res = Math::CBigInt();
     
     res = Math::CBigInt::modularExponentiation(base, exponent, mod);
     ASSERT_EQ(res.getNumber(), "445");
@@ -311,4 +370,10 @@ TEST(arithmeticOperator, modularExponentiation) {
     mod = 67;
     res = Math::CBigInt::modularExponentiation(base, exponent, mod);
     ASSERT_EQ(res.getNumber(), "55");
+    
+    base = 2;
+    exponent = 4096;
+    mod = 3041;
+    res = Math::CBigInt::modularExponentiation(base, exponent, mod);
+    ASSERT_EQ(res.getNumber(), "1586");
 }
