@@ -9,9 +9,11 @@ find_package(GMP REQUIRED)
 set(CMAKE_CXX_STANDARD 14)
 
 set(SOURCE_FILES src/math_bigint.cpp
-        src/crypto_diffieHellman.cpp)
+        src/crypto_diffieHellman.cpp
+        src/profiler.cpp)
 set(HEADER_FILES include/math_bigint.h
-        include/crypto_diffieHellman.h)
+        include/crypto_diffieHellman.h
+        include/profiler.h)
 set(MEASUREMENT_FILES src/profiler.cpp
         include/profiler.h
         src/main_measurement.cpp)

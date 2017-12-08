@@ -17,13 +17,6 @@ namespace Math
         m_IsSigned = false;
     }
     
-    /*
-    CBigInt::CBigInt(CBigInt &_bigInt)
-    {
-        m_Representation = _bigInt.getNumber();
-        m_IsSigned = _bigInt.getSign();
-    }*/
-    
     CBigInt::CBigInt(CBigInt *_bigInt)
     {
         m_Representation = _bigInt->getNumber();
@@ -102,7 +95,6 @@ namespace Math
         return tmp;
     }
     
-    // prefix increment operators directly modify the original value without first copying it.
     CBigInt& CBigInt::operator++() {
         *this += 1;
         return *this;
@@ -113,8 +105,6 @@ namespace Math
         return *this;
     }
     
-    // postfix increment operators always return a copy of the value before the operation took place.
-    // The original value is however altered.
     CBigInt CBigInt::operator++(int) {
         CBigInt copy(*this);
         *this += 1;
@@ -155,7 +145,7 @@ namespace Math
         
         size_t len_max = _other.getNumber().length();
         size_t len_min = m_Representation.length();
-        bool otherIsLarger = _other > this;
+        bool otherIsLarger = _other > *this;
         if (!otherIsLarger) {
             len_max = m_Representation.length();
             len_min = _other.getNumber().length();
@@ -234,7 +224,7 @@ namespace Math
     
         size_t len_max = _other.getNumber().length();
         size_t len_min = m_Representation.length();
-        bool otherIsLarger = _other > this;
+        bool otherIsLarger = _other > *this;
         if (!otherIsLarger) {
             len_max = m_Representation.length();
             len_min = _other.getNumber().length();
@@ -440,9 +430,6 @@ namespace Math
     }
     
     
-    // splits the given input string into two substrings at the position "_at" counting from the right (end) of the
-    // original string. E.g. when _inputNumber = 1234567, _at = 2 then _highOrder = 1234 and _lowOrder = 567
-    
     void CBigInt::split(const CBigInt &_inputNumber, size_t _at, CBigInt &_highOrder, CBigInt &_lowOrder) const{
         size_t inputLength = _inputNumber.getNumber().length();
         
@@ -471,33 +458,6 @@ namespace Math
         return tmp;
     }
     
-    /*
-     * Throughout this implementation the definitions of modulus and remainder from the Ada'83 language specification
-     * is used.
-     * Integer division is defined as follows in this context:
-     * A = (A/B)*B + (A rem B)
-     * where (A rem B) has the sign of A and |(A rem B)| < B
-     *
-     * The result of the modulus operation (A mod B) is such that it has the sign of B and |(A mod B)| < B
-     * Additionally for some Integer Value N the following holds:
-     * A = B*N + (A mod B)
-     *
-     *  A   B   A/B   A rem B  A mod B     A     B    A/B   A rem B   A mod B
-
-        10   5    2       0        0      -10     5    -2       0         0
-        11   5    2       1        1      -11     5    -2      -1         4
-        12   5    2       2        2      -12     5    -2      -2         3
-        13   5    2       3        3      -13     5    -2      -3         2
-        14   5    2       4        4      -14     5    -2      -4         1
-    
-        10  -5   -2       0        0      -10    -5     2       0         0
-        11  -5   -2       1       -4      -11    -5     2      -1        -1
-        12  -5   -2       2       -3      -12    -5     2      -2        -2
-        13  -5   -2       3       -2      -13    -5     2      -3        -3
-        14  -5   -2       4       -1      -14    -5     2      -4        -4
-     * Source: http://archive.adaic.com/standards/83lrm/html/lrm-04-05.html
-     */
-    
     CBigInt CBigInt::simpleModulo(CBigInt &_dividend, CBigInt &_divisor) {
         // _dividend mod _divisor
         // modulo is defined as x mod y = x - y * floor(x / y)
@@ -509,9 +469,6 @@ namespace Math
         return  _dividend - _divisor * longDivision(_dividend, _divisor, res);
     }
     
-    
-    // The result of the floored division is the largest whole number smaller or equal to the result of the
-    // division. E.g. 5 / 2 = 2, -5 / 2 = -3
     CBigInt CBigInt::simpleFlooredDivision(CBigInt _dividend, const CBigInt &_divisor) const{
         assert(_divisor != g_Zero);
         
@@ -561,6 +518,7 @@ namespace Math
         CBigInt positiveDividend = CBigInt(_dividend.m_Representation);
         if (positiveDivisor > positiveDividend) return CBigInt();
         
+        // if the length difference between dividend and divisor is too small simple floored division is faster.
         if ((_dividend.getNumber().length() - _divisor.getNumber().length()) < 3) {
             return simpleFlooredDivision(_dividend, _divisor);
         }
@@ -655,8 +613,6 @@ namespace Math
         return simpleCeiledDivision(_dividend, _divisor);
     }
     
-    
-    // time-complexity: O(log n) assuming constant time for multiplication
     CBigInt CBigInt::expBySquaring(CBigInt& _base, CBigInt& _exponent){
         if (_exponent == g_Zero ) return CBigInt(g_One);
         
@@ -671,14 +627,10 @@ namespace Math
                 _base = _base * _base;
                 _exponent = (_exponent - g_One) / g_Two;
             }
-            //std::cout << "base: " << _base.getNumber() << "\texponent: " << _exponent.getNumber() << std::endl;
         }
         return _base * y;
     }
     
-    // calculates _base^_exponent % _mod
-    // time-complexity: O(log N)
-    // function consumes a lot of memory for large inputs due to memory inefficient multiplication, modulo and division
     CBigInt CBigInt::modularExponentiation(CBigInt &_base, CBigInt _exponent, CBigInt &_mod) {
         CBigInt s = _base % _mod;
         CBigInt c = 1;
@@ -708,8 +660,12 @@ namespace Math
         rand.seed(_seed);
         
         mpz_class arg(_upperBound.getNumber());
+        // in some IDEs an error in the following line might be shown. This is however due to the return value of
+        // of get_z_range being automatically converted to an instance of mpz_class from an internal representation
+        // which is not recognised by some IDEs.
         mpz_class result = rand.get_z_range(arg);
         
+        // get_str(10) returns the result as a string of base 10 digits.
         _target = result.get_str(10);
     }
     
@@ -730,7 +686,6 @@ namespace Math
         return true;
     }
     
-    // returns composite if *this is composite, otherwise *this is probably prime
     const bool CBigInt::millerRabin(const size_t _repetitions) const {
         if (*this < CBigInt(500)) {
             return simplePrimalityTest();
@@ -760,7 +715,6 @@ namespace Math
             
             for (CBigInt j = 1; j < r; ++j) {
                 x = CBigInt::modularExponentiation(x, g_Two, copy);
-                //x = (x*x) % copy;
                 if (x == g_One) return false;
                 if (x == (copy - g_One)) {
                     breakToOuterLoop = true;
