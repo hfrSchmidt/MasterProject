@@ -73,6 +73,7 @@ TEST(arithmeticOperator, minus) {
     ASSERT_FALSE((bigInt - bigInt2).getSign());
 }
 
+// if input is small enough the * operator uses the simple multiplication algorithm
 TEST(arithmeticOperator, simpleMultiplication) {
     Math::CBigInt bigInt = Math::CBigInt("9");
     Math::CBigInt bigInt2 = Math::CBigInt("4");

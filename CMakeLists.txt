@@ -3,7 +3,7 @@ project(MasterProjekt)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakeModules/")
 
-find_package(Threads REQUIRED)
+find_package(Threads REQUIRED) #required for googletest
 find_package(GMP REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)

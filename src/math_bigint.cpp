@@ -1,7 +1,3 @@
-//
-// Created by hs on 14.04.17.
-//
-
 #include "../include/math_bigint.h"
 
 namespace Math

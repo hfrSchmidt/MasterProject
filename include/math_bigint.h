@@ -1,11 +1,9 @@
 #pragma once
 
-#include <string>
-#include <cstring>
-#include <cstdlib>
-#include <cassert>
-#include <iostream>
-#include <gmpxx.h>
+#include <string>   // std::string
+#include <cassert>  // assert
+#include <iostream> // I/O operations
+#include <gmpxx.h>  // arbitrary large random number generation
 
 /*
 defines the number of repetitions of the miller-rabin test
@@ -137,7 +135,7 @@ namespace Math
         CBigInt operator+ (const CBigInt& _other);
         CBigInt operator- (const CBigInt& _other);
         // for replacing the implementation of multiplication, division, modulo and exponentiation change the
-        // respective function call in the operators.
+        // corresponding function call in the operators.
         CBigInt operator* (CBigInt _other) const;
         CBigInt operator/ (const CBigInt& _other);
         CBigInt operator% (CBigInt& _other);
@@ -161,6 +159,8 @@ namespace Math
         
         // public interface to ceiledDivision for testing purposes.
         CBigInt ceiledDivision(CBigInt &_dividend, const CBigInt &_divisor);
+        
+        // returns true if the number is even.
         const bool isEven() const;
         
         // for further descriptions see simplePrimalityTest() and millerRabin()
@@ -178,6 +178,8 @@ namespace Math
     
     }; // class CBigInt
     
+    // template specialisation for the case of assignment from a CBigInt instance circumventing
+    // the constructor call.
     template<>
     inline CBigInt& CBigInt::operator=(CBigInt const &_other)
     {

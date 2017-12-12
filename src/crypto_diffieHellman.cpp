@@ -1,5 +1,8 @@
 #include "../include/crypto_diffieHellman.h"
+#include <gmpxx.h>
+#include <gmp.h>
 
+// defines the amount of measurements for each prime number, over which a mean value is calculated.
 #define NO_OF_MEASUREMENTS 5
 
 using namespace Crypto;
@@ -183,33 +186,60 @@ void CDiffieHellman::profileExchange() {
     
     std::cout << "Starting to measure..." << std::endl;
     
+    /* Uncomment the following for a comparison measurement with the GMP library
+    mpz_t sValAlice, sValBob, calcValAlice, calcValBob;
+    mpz_inits(sValAlice, sValBob, calcValAlice, calcValBob, NULL);
+    mpz_t g, prime;
+    mpz_init(prime);
+    if (mpz_init_set_str(g, m_generator.getNumber().c_str(), 10) ==-1) exit(EXIT_FAILURE);
+    */
+    
     for (const auto &i : primesToBeMeasured) {
         std::cout << "Measuring " << i.first << " bit prime..." << std::endl;
         
         for (auto j = 0; j < NO_OF_MEASUREMENTS; ++j) {
+            // Uncomment the following for a comparison measurement with the GMP library
+            //mpz_t secretA, secretB;
             p.startClockMeasure();
             p.startCycle = p.cycleMeasure();
     
             m_prime = i.second;
+            /* Uncomment the following for a comparison measurement with the GMP library
+            if (mpz_init_set_str(prime, m_prime.getNumber().c_str(), 10) ==-1) exit(EXIT_FAILURE);
             setupClientAlice(seed, secretKeyAlice);
             setupClientBob(++seed, secretKeyBob);
+            if (mpz_init_set_str(secretA, secretKeyAlice.getNumber().c_str(), 10) ==-1) exit(EXIT_FAILURE);
+            if (mpz_init_set_str(secretB, secretKeyBob.getNumber().c_str(), 10) ==-1) exit(EXIT_FAILURE);
+            mpz_powm(sValAlice, g, secretA, prime);
+            mpz_powm(sValBob, g, secretB, prime);
+            mpz_powm(calcValAlice, sValBob, secretA, prime);
+            mpz_powm(calcValBob, sValAlice, secretB, prime);
+            */
+            
+            // Comment out the following in case of performing a comparison measurement with the
+            // GMP library.
             sendValueAlice = Math::CBigInt::modularExponentiation(m_generator, secretKeyAlice, m_prime);
             sendValueBob = Math::CBigInt::modularExponentiation(m_generator, secretKeyBob, m_prime);
             calculatedSharedSecretAlice = Math::CBigInt::modularExponentiation(sendValueBob, secretKeyAlice, m_prime);
             calculatedSharedSecretBob = Math::CBigInt::modularExponentiation(sendValueAlice, secretKeyBob, m_prime);
-    
+            // until here
+            
             p.stopCycle = p.cycleMeasure();
             p.stopClockMeasure();
             p.clockMeasurements.push_back(p.diffClock);
             p.cycleMeasurements.push_back(p.stopCycle - p.startCycle);
-    
+            // Uncomment the following for a comparison measurement with the GMP library
+            // assert(mpz_cmp(calcValAlice, calcValBob) == 0);
+            // mpz_clears(secretA, secretB, NULL);
             assert(calculatedSharedSecretAlice == calculatedSharedSecretBob);
         }
         
         p.doStats();
-        p.writeToFile(std::to_string(i.first), "measurements_clock", 1);
-        p.writeToFile(std::to_string(i.first), "measurements_cycle", 2);
+        p.writeToFile(std::to_string(i.first), "measurements_clock_MPZ", 1);
+        p.writeToFile(std::to_string(i.first), "measurements_cycle_MPZ", 2);
         p.clockMeasurements.clear();
         p.cycleMeasurements.clear();
     }
+    // Uncomment the following for a comparison measurement with the GMP library
+    //mpz_clears(sValAlice, sValBob, calcValAlice, calcValBob, g, prime, NULL);
 }
