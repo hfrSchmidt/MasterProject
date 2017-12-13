@@ -34,10 +34,9 @@ include_directories(./googletest/googletest/include)
 target_link_libraries(MasterProjekt_Test
         ${CMAKE_SOURCE_DIR}/googletest/googletest/build/libgtest.a
         ${CMAKE_SOURCE_DIR}/googletest/googletest/build/libgtest_main.a
-        gmp
-        gmpxx
+        ${GMP_LIBRARIES} ${GMPXX_LIBRARIES}
         )
 target_link_libraries(MasterProjekt_Test Threads::Threads)
 
-target_link_libraries(MasterProjekt_Measurement gmp gmpxx)
-target_link_libraries(MasterProjekt gmp gmpxx)
+target_link_libraries(MasterProjekt_Measurement ${GMP_LIBRARIES} ${GMPXX_LIBRARIES})
+target_link_libraries(MasterProjekt ${GMP_LIBRARIES} ${GMPXX_LIBRARIES})
